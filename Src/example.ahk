@@ -10,37 +10,42 @@ SendMode Input ; Recommended for new scripts due to its superior speed and relia
 
 return ; nothing to do in the main part of the script
 
+;  line navigation for visual studio
+checkIfLineNavigation(ScrollDir, MsNatural4000){
+    if WinActive("ahk_exe Code.exe") or WinActive("ahk_exe devenv.exe"){
+        if (ScrollDir = 1){
+            arrow = Up
+        }
+        else{
+            arrow = Down
+        }
+
+        if MsNatural4000.keyModifiers.Shift and MsNatural4000.keyModifiers.Ctrl{
+            Send, {ShiftDown}{CtrlDown}{%arrow%}
+        }
+        else if MsNatural4000.keyModifiers.Shift{
+            Send, {ShiftDown}{%arrow%}
+        }
+        else if MsNatural4000.keyModifiers.Ctrl{
+            Send, {CtrlDown}{%arrow%}
+        }
+        else {
+            Send, {%arrow%}
+        }
+        return 1
+    }
+    return 0
+}
+
 ; === Use the zoom button to scroll ===
 DoScroll:
-        ;  line navigation for visual studio
-        if (ScrollDir = 1){
-        if WinActive("ahk_exe Code.exe") or WinActive("ahk_exe devenv.exe"){
-            if MsNatural4000.keyModifiers.Shift and MsNatural4000.keyModifiers.Ctrl{
-                Send, {ShiftDown}{CtrlDown}{Up}
-                return
-            }
-            if MsNatural4000.keyModifiers.Shift{
-                Send, {ShiftDown}{Up}
-                return
-            }
-            Send, {Up}
-            return
-        }
+    if (checkIfLineNavigation(ScrollDir, MsNatural4000)){
+        return
+    }
+    if (ScrollDir = 1){
         SendInput, {WheelUp}
     }
     else{
-        if WinActive("ahk_exe Code.exe") or WinActive("ahk_exe devenv.exe"){
-            if MsNatural4000.keyModifiers.Shift and MsNatural4000.keyModifiers.Ctrl{
-                Send, {ShiftDown}{CtrlDown}{Down}
-                return
-            }
-            if MsNatural4000.keyModifiers.Shift{
-                Send, {ShiftDown}{Down}
-                return
-            }
-            Send, {Down}
-            return
-        }
         SendInput, {WheelDown}
     }
     return
@@ -48,13 +53,13 @@ DoScroll:
 MsNatural4000_ZoomDown:
     ScrollDir := 2
     GoSub, DoScroll
-    SetTimer, DoScroll, 130
+    SetTimer, DoScroll, 120
     return
 
 MsNatural4000_ZoomUp:
     ScrollDir := 1
     GoSub, DoScroll
-    SetTimer, DoScroll, 130
+    SetTimer, DoScroll, 120
     return
 
 MsNatural4000_KeyUp:
@@ -65,20 +70,9 @@ MsNatural4000_KeyUp:
 
 ; === Example of using modifiers while pressing a button ===
 MsNatural4000_MyFavorites:
-    if MsNatural4000.keyModifiers.Shift {
-        MsgBox Shift and MyFavorites button
-        return
-    }
-
-    if MsNatural4000.keyModifiers.LCtrl and MsNatural4000.keyModifiers.RCtrl {
-        MsgBox LeftCtrl+RightCtrl and MyFavorites button
-        return
-    }
-
-    if MsNatural4000.keyModifiers.Fn {
-        MsgBox "My Favorites Button while Fn-lock is Enabled"
-    }
-
+    Send, ^c
+    Sleep 50
+    Run, http://www.duckduckgo.com/?q=%clipboard%
     return
 ; ======
 
